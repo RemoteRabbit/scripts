@@ -10,6 +10,7 @@ if ! git show-ref --verify --quiet refs/heads/main; then
     base_branch="master"
 fi
 
+# Gets commit hash, author name, and commit messages
 commit_messages=$(git log --format="%h - %an: %s" $base_branch..$current_branch)
 
 # Check if there are any commits
@@ -26,7 +27,7 @@ $commit_messages
 
 Please format the release notes in a clear, concise manner, following these guidelines:
 1. Group similar changes together if applicable.
-2. Include the commit hashes and authors in your notes.
+2. Include the commit hashes in your notes.
 3. Do not include any introductory text at the beginning of your response.
 4. Use bullet points or numbered lists for better readability.
 5. Highlight significant changes or features.
