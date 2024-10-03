@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+# Check if we're in a Git repository
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    echo "Error: Not in a Git repository." >&2
+    exit 1
+fi
+
 # Get the current branch name
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 
-# Get the commit messages for the current branch
-# This assumes you want all commits that are in this branch but not in main/master
+# Determine the base branch (main or master)
 base_branch="main"
 if ! git show-ref --verify --quiet refs/heads/main; then
     base_branch="master"
 fi
 
-# Gets commit hash, author name, and commit messages
+# Get commit messages
 commit_messages=$(git log --format="%h - %an: %s" $base_branch..$current_branch)
 
 # Check if there are any commits
@@ -20,8 +27,7 @@ if [ -z "$commit_messages" ]; then
 fi
 
 # Prepare the prompt for Cody
-read -r -d '' prompt << EOM
-Generate release notes based on the following commit messages:
+prompt="Generate release notes based on the following commit messages:
 
 $commit_messages
 
@@ -31,22 +37,37 @@ Please format the release notes in a clear, concise manner, following these guid
 3. Do not include any introductory text at the beginning of your response.
 4. Use bullet points or numbered lists for better readability.
 5. Highlight significant changes or features.
-6. Keep each line under 120 characters for better formatting.
-EOM
+6. Keep each line under 120 characters for better formatting."
 
 # Use Cody to generate release notes
 echo "Generating release notes with Cody..."
-release_notes=$(cody chat "$prompt")
+temp_file=$(mktemp)
+if ! cody chat "$prompt" > "$temp_file"; then
+    echo "Error: Failed to generate release notes with Cody." >&2
+    rm "$temp_file"
+    exit 1
+fi
 
 # Copy the release notes to clipboard
-echo "$release_notes" | pbcopy
+cat "$temp_file" | pbcopy
 
 # Output confirmation
 echo "Release notes have been generated and copied to your clipboard."
 echo "You can now paste them into your desired application."
 
-# Optionally, display the release notes in the terminal
-echo ""
-echo "Generated Release Notes:"
+# Display the release notes in the terminal
+echo -e "\nGenerated Release Notes:"
 echo "========================"
-echo "$release_notes"
+cat "$temp_file"
+
+# Option to save to file
+read -p "Do you want to save the release notes to a file? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    read -p "Enter filename (default: release_notes.md): " filename
+    filename=${filename:-release_notes.md}
+    mv "$temp_file" "$filename"
+    echo "Release notes saved to $filename"
+else
+    rm "$temp_file"
+fi
