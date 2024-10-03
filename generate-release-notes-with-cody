@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# Get the current branch name
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Get the commit messages for the current branch
+# This assumes you want all commits that are in this branch but not in main/master
+base_branch="main"
+if ! git show-ref --verify --quiet refs/heads/main; then
+    base_branch="master"
+fi
+
+# Gets commit hash, author name, and commit message
+commit_messages=$(git log --format="%h - %an: %s" $base_branch..$current_branch)
+
+# Check if there are any commits
+if [ -z "$commit_messages" ]; then
+    echo "No commits found on the current branch that are not in $base_branch."
+    exit 0
+fi
+
+# Prepare the prompt for Cody
+prompt="Generate release notes based on the following commit messages:\n\n$commit_messages\n\nPlease format the release notes in a clear, concise manner, grouping similar changes together if applicable. While also adding the shortend hash for each commit like (hash)"
+
+# Use Cody to generate release notes
+echo "Generating release notes with Cody..."
+release_notes=$(cody chat "$prompt")
+
+# Copy the release notes to clipboard
+echo "$release_notes" | pbcopy
+
