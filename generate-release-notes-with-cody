@@ -10,7 +10,7 @@ if ! git show-ref --verify --quiet refs/heads/main; then
     base_branch="master"
 fi
 
-# Gets commit hash, author name, and commit message
+# Gets commit hash, author name, and commit messages
 commit_messages=$(git log --format="%h - %an: %s" $base_branch..$current_branch)
 
 # Check if there are any commits
@@ -20,7 +20,19 @@ if [ -z "$commit_messages" ]; then
 fi
 
 # Prepare the prompt for Cody
-prompt="Generate release notes based on the following commit messages:\n\n$commit_messages\n\nPlease format the release notes in a clear, concise manner, grouping similar changes together if applicable. While also adding the shortend hash for each commit like (hash)"
+read -r -d '' prompt << EOM
+Generate release notes based on the following commit messages:
+
+$commit_messages
+
+Please format the release notes in a clear, concise manner, following these guidelines:
+1. Group similar changes together if applicable.
+2. Include the commit hashes in your notes.
+3. Do not include any introductory text at the beginning of your response.
+4. Use bullet points or numbered lists for better readability.
+5. Highlight significant changes or features.
+6. Keep each line under 120 characters for better formatting.
+EOM
 
 # Use Cody to generate release notes
 echo "Generating release notes with Cody..."
@@ -29,3 +41,12 @@ release_notes=$(cody chat "$prompt")
 # Copy the release notes to clipboard
 echo "$release_notes" | pbcopy
 
+# Output confirmation
+echo "Release notes have been generated and copied to your clipboard."
+echo "You can now paste them into your desired application."
+
+# Optionally, display the release notes in the terminal
+echo ""
+echo "Generated Release Notes:"
+echo "========================"
+echo "$release_notes"
