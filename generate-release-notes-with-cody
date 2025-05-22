@@ -19,9 +19,6 @@
 #      REVISION:  ---
 #===============================================================================
 
-# Script starts here
-
-
 set -euo pipefail
 
 # Check if we're in a Git repository
