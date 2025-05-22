@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+#===============================================================================
+#
+#          FILE:  generate-release-notes-with-cody.sh
+# 
+#         USAGE:  ./generate-release-notes-with-cody.sh
+# 
+#   DESCRIPTION:  Generates release notes using Cody by analyzing git commit history.
+#                 Designed to streamline changelog creation for software releases.
+# 
+#       OPTIONS:  None
+#  REQUIREMENTS:  Cody CLI, Git, jq
+#          BUGS:  Report issues at: https://github.com/RemoteRabbit/scripts/issues
+#         NOTES:  Make sure Cody is authenticated and configured before running.
+#        AUTHOR:  RemoteRabbit (https://github.com/RemoteRabbit, https://remoterabbit.io)
+#       VERSION:  1.0
+#       CREATED:  2025-05-22
+#      REVISION:  ---
+#===============================================================================
+
+# Script starts here
+
+
 set -euo pipefail
 
 # Check if we're in a Git repository
