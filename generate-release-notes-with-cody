@@ -3,12 +3,10 @@
 #===============================================================================
 #
 #          FILE:  generate-release-notes-with-cody.sh
-# 
 #         USAGE:  ./generate-release-notes-with-cody.sh
-# 
 #   DESCRIPTION:  Generates release notes using Cody by analyzing git commit history.
 #                 Designed to streamline changelog creation for software releases.
-# 
+#       LICENSE:  GNU General Public License v3.0
 #       OPTIONS:  None
 #  REQUIREMENTS:  Cody CLI, Git, jq
 #          BUGS:  Report issues at: https://github.com/RemoteRabbit/scripts/issues
